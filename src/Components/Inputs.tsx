@@ -8,7 +8,7 @@ interface InputsProps {
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-export default function Inputs({ label, type, name, value, onChange }: InputsProps) {
+export default function Inputs({ label, type, name, value, onChange,}: InputsProps) {
   return (
     <div>
       <TextField
@@ -16,7 +16,7 @@ export default function Inputs({ label, type, name, value, onChange }: InputsPro
         id={name}
         name={name}
         label={label}
-        variant="outlined"
+        variant="filled"
         value={value}
         onChange={onChange}
         fullWidth

@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-    Alert,
+  Alert,
   Box,
   Button,
   FormControl,
   InputLabel,
   MenuItem,
   Select,
+  TextField,
   Typography,
 } from "@mui/material";
 import { Formik, Form, Field } from "formik";
@@ -45,8 +46,8 @@ const validationSchema = Yup.object({
 });
 
 export default function Registration() {
-    const [existingUser, setExistingUser] = useState('')
-    const navigate = useNavigate()
+  const [existingUser, setExistingUser] = useState("");
+  const navigate = useNavigate();
   const initialValues = {
     name: "",
     email: "",
@@ -63,9 +64,9 @@ export default function Registration() {
         values
       );
       console.log("API Response:", response.data);
-      navigate('/login')
-    } catch (error:any) {
-      setExistingUser(error.response?.data?.error || 'An error occurred');
+      navigate("/login");
+    } catch (error: any) {
+      setExistingUser(error.response?.data?.error || "An error occurred");
     }
   };
 
@@ -76,9 +77,13 @@ export default function Registration() {
       onSubmit={handleSubmit}
     >
       {({ values, handleChange }) => (
-        <Form className="max-w-2xl md:mx-auto bg-white p-6 shadow-xl rounded-lg mt-10 mx-4">
+        <Form className="max-w-2xl md:mx-auto p-6 shadow-xl rounded-lg my-10 mx-4">
           <Box display="flex" flexDirection="column" gap={1}>
-            <Typography component="h1" variant="h3" className="text-center pb-3">
+            <Typography
+              component="h1"
+              variant="h3"
+              className="text-center pb-3"
+            >
               Register
             </Typography>
             {/* Name */}
@@ -89,7 +94,7 @@ export default function Registration() {
               onChange={handleChange}
               value={values.name}
             />
-            <ErrorMessageComp name="name"/>
+            <ErrorMessageComp name="name" />
 
             {/* Email */}
             <Inputs
@@ -99,10 +104,12 @@ export default function Registration() {
               onChange={handleChange}
               value={values.email}
             />
-            <ErrorMessageComp name="email"/>
-            {existingUser && 
-            <Alert severity="warning" className="mb-4">{existingUser}</Alert>
-            }
+            <ErrorMessageComp name="email" />
+            {existingUser && (
+              <Alert severity="warning" className="mb-4">
+                {existingUser}
+              </Alert>
+            )}
             {/* Password */}
             <Inputs
               label="Password"
@@ -111,7 +118,7 @@ export default function Registration() {
               onChange={handleChange}
               value={values.password}
             />
-            <ErrorMessageComp name="password"/>
+            <ErrorMessageComp name="password" />
 
             {/* Confirm Password */}
             <Inputs
@@ -121,21 +128,29 @@ export default function Registration() {
               onChange={handleChange}
               value={values.rePassword}
             />
-            <ErrorMessageComp name="rePassword"/>
+            <ErrorMessageComp name="rePassword" />
 
             {/* Date of Birth */}
-            <Inputs
-              label=""
+            <TextField
               type="date"
+              id="dateOfBirth"
               name="dateOfBirth"
-              onChange={handleChange}
+              label="Birthday"
+              variant="filled"
               value={values.dateOfBirth}
+              onChange={handleChange}
+              fullWidth
+              slotProps={{
+                inputLabel: {
+                  shrink: true,
+                },
+              }}
             />
-            <ErrorMessageComp name="dateOfBirth"/>
+            <ErrorMessageComp name="dateOfBirth" />
 
             {/* Gender */}
-            <FormControl fullWidth className="mb-2">
-              <InputLabel id="gender-label" className="bg-white">Gender</InputLabel>
+            <FormControl variant="filled" fullWidth className="mb-2">
+              <InputLabel id="gender-label">Gender</InputLabel>
               <Field
                 as={Select}
                 name="gender"
@@ -146,7 +161,7 @@ export default function Registration() {
                 <MenuItem value="male">Male</MenuItem>
                 <MenuItem value="female">Female</MenuItem>
               </Field>
-                <ErrorMessageComp name="gender"/>
+              <ErrorMessageComp name="gender" />
             </FormControl>
 
             {/* Submit Button */}
