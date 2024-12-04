@@ -18,7 +18,7 @@ import { useNavigate } from "react-router-dom";
 import ErrorMessageComp from "../Components/ErrorMessageComp";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "../lib/store";
+import { GlobalState } from "../lib/store";
 
 const validationSchema = Yup.object({
   name: Yup.string()
@@ -49,7 +49,7 @@ const validationSchema = Yup.object({
 
 export default function Registration() {
   const [existingUser, setExistingUser] = useState("");
-  const {token} = useSelector((state:RootState)=>state.auth)
+  const {token} = useSelector((state:GlobalState)=>state.auth)
   const navigate = useNavigate();
   useEffect(()=>{
     if (token) {
