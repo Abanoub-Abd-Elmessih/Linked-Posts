@@ -30,10 +30,12 @@ function Navbar() {
     ...(token ? [{ path: "/", text: "Home" }] : []),
   ];
   const settings = [
-    ...(token ? [
-      { path: "/login", text: "Logout" },
-      { path: "/profile", text: "Profile" },
-    ] : []),
+    ...(token
+      ? [
+        { path: "/profile", text: "Profile" },
+        { path: "/login", text: "Logout" },
+        ]
+      : []),
   ];
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
@@ -42,7 +44,6 @@ function Navbar() {
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null
   );
-
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -67,7 +68,7 @@ function Navbar() {
             variant="h6"
             noWrap
             component={Link}
-            to={'/'}
+            to={"/"}
             sx={{
               mr: 2,
               display: { xs: "none", md: "flex" },
@@ -122,7 +123,7 @@ function Navbar() {
             variant="h5"
             noWrap
             component={Link}
-            to={'/'}
+            to={"/"}
             sx={{
               mr: 2,
               display: { xs: "flex", md: "none" },
@@ -150,11 +151,13 @@ function Navbar() {
             ))}
           </Box>
           <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-              </IconButton>
-            </Tooltip>
+            {token && (
+              <Tooltip title="Open settings">
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                </IconButton>
+              </Tooltip>
+            )}
             <Menu
               sx={{ mt: "45px" }}
               id="menu-appbar"

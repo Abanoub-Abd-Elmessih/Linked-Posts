@@ -49,13 +49,13 @@ const validationSchema = Yup.object({
 
 export default function Registration() {
   const [existingUser, setExistingUser] = useState("");
-  const {token} = useSelector((state:GlobalState)=>state.auth)
+  const { token } = useSelector((state: GlobalState) => state.auth);
   const navigate = useNavigate();
-  useEffect(()=>{
+  useEffect(() => {
     if (token) {
-      navigate('/')
+      navigate("/");
     }
-  },[token,navigate])
+  }, [token, navigate]);
   const initialValues = {
     name: "",
     email: "",
@@ -87,13 +87,18 @@ export default function Registration() {
       {({ values, handleChange }) => (
         <Form className="max-w-2xl md:mx-auto border border-gray-200 p-6 shadow-xl rounded-lg my-10 mx-4">
           <Box display="flex" flexDirection="column" gap={1}>
-            <Typography
-              component="h1"
-              variant="h3"
-              className="text-center pb-3"
-            >
+            <Typography component="h1" variant="h3" className="text-center">
               Registration
             </Typography>
+            <Box
+              sx={{
+                width: { xs: "80%", sm: "50%" },
+                height: "4px",
+                background: "linear-gradient(90deg, #1e3a8a, #3b82f6)",
+                marginY: "4px",
+                marginX: "auto",
+              }}
+            />
             {/* Name */}
             <Inputs
               label="Name"
