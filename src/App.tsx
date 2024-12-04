@@ -1,10 +1,11 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-// import Navbar from "./Components/Navbar";
 import Registration from "./Pages/Registration";
 import Login from "./Pages/Login";
 import Layout from "./Pages/Layout";
 import Home from "./Pages/Home";
-
+import { Provider } from "react-redux";
+import { store } from "./lib/store";
+import ProtectedRoute from "./Components/ProtectedRoute";
 function App() {
   const router = createBrowserRouter([
     {
@@ -13,7 +14,9 @@ function App() {
       children: [
         {
           index: true,
-          element: <Home />,
+          element: <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>,
         },
         {
           path: "/registration",
@@ -28,9 +31,9 @@ function App() {
   ]);
 
   return (
-    <>
+    <Provider store={store}>
       <RouterProvider router={router} />
-    </>
+    </Provider>
   );
 }
 

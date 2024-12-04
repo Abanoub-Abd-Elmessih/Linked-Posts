@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Alert,
   Box,
@@ -7,11 +6,14 @@ import {
 } from "@mui/material";
 import { Formik, Form, } from "formik";
 import * as Yup from "yup";
-import axios from "axios";
 import Inputs from "../Components/Inputs";
 import { useNavigate } from "react-router-dom";
 import ErrorMessageComp from "../Components/ErrorMessageComp";
-import { useState } from "react";
+import { useEffect} from "react";
+import { LoginData } from "../Interfaces/LoginData";
+import { login } from "../lib/Slices/AuthSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../lib/store";
 
 const validationSchema = Yup.object({
   email: Yup.string().email("Invalid email").required("Email is required"),
@@ -20,25 +22,24 @@ const validationSchema = Yup.object({
 });
 
 export default function Login() {
-  const [existingUser, setExistingUser] = useState("");
+  const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate();
+  const {error , isError, isLoading , token} = useSelector((state:RootState)=>state.auth)
   const initialValues = {
     email: "",
     password: "",
   };
 
-  const handleSubmit = async (values: typeof initialValues) => {
-    try {
-      const response = await axios.post(
-        "https://linked-posts.routemisr.com/users/signin",
-        values
-      );
-      console.log("API Response:", response.data);
-      navigate("/");
-    } catch (error: any) {
-      setExistingUser(error.response?.data?.error || "An error occurred");
+  useEffect(()=>{
+    if (token != '') {
+      navigate('/')
     }
+  },[token , navigate])
+
+  const handleSubmit = (values: LoginData) => {
+    dispatch(login(values));
   };
+  
 
   return (
     <Formik
@@ -66,9 +67,9 @@ export default function Login() {
               value={values.email}
             />
             <ErrorMessageComp name="email" />
-            {existingUser && (
+            {isError && (
               <Alert severity="warning" className="mb-4">
-                {existingUser}
+                {error}
               </Alert>
             )}
             {/* Password */}
@@ -81,7 +82,7 @@ export default function Login() {
             />
             <ErrorMessageComp name="password" />
             {/* Submit Button */}
-            <Button variant="contained" type="submit" className="w-full">
+            <Button disabled={isLoading} variant="contained" type="submit" className="w-full">
               Login
             </Button>
           </Box>

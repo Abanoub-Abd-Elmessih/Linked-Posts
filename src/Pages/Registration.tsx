@@ -16,7 +16,9 @@ import axios from "axios";
 import Inputs from "../Components/Inputs";
 import { useNavigate } from "react-router-dom";
 import ErrorMessageComp from "../Components/ErrorMessageComp";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "../lib/store";
 
 const validationSchema = Yup.object({
   name: Yup.string()
@@ -47,7 +49,13 @@ const validationSchema = Yup.object({
 
 export default function Registration() {
   const [existingUser, setExistingUser] = useState("");
+  const {token} = useSelector((state:RootState)=>state.auth)
   const navigate = useNavigate();
+  useEffect(()=>{
+    if (token) {
+      navigate('/')
+    }
+  },[token,navigate])
   const initialValues = {
     name: "",
     email: "",
@@ -77,14 +85,14 @@ export default function Registration() {
       onSubmit={handleSubmit}
     >
       {({ values, handleChange }) => (
-        <Form className="max-w-2xl md:mx-auto p-6 shadow-xl rounded-lg my-10 mx-4">
+        <Form className="max-w-2xl md:mx-auto border border-gray-200 p-6 shadow-xl rounded-lg my-10 mx-4">
           <Box display="flex" flexDirection="column" gap={1}>
             <Typography
               component="h1"
               variant="h3"
               className="text-center pb-3"
             >
-              Register
+              Registration
             </Typography>
             {/* Name */}
             <Inputs
