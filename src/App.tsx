@@ -6,6 +6,7 @@ import Home from "./Pages/Home";
 import { Provider } from "react-redux";
 import { store } from "./lib/store";
 import ProtectedRoute from "./Components/ProtectedRoute";
+import Profile from "./Pages/Profile";
 function App() {
   const router = createBrowserRouter([
     {
@@ -16,6 +17,12 @@ function App() {
           index: true,
           element: <ProtectedRoute>
             <Home />
+          </ProtectedRoute>,
+        },
+        {
+          path:'/profile',
+          element: <ProtectedRoute>
+            <Profile />
           </ProtectedRoute>,
         },
         {

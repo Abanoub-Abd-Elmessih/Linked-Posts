@@ -16,7 +16,13 @@ export const authSlice = createSlice({
     error:'',
     isSuccess:false,
   },
-  reducers: {},
+  reducers: {
+    logout(state) {
+      state.token = "";
+      state.isSuccess = false;
+      localStorage.removeItem("token");
+    }
+  },
   extraReducers(builder){
     builder.addCase(login.fulfilled,(state,action:any) => {
         state.token = action.payload.data.token;
@@ -42,5 +48,5 @@ export const authSlice = createSlice({
     })
   }
 });
-
+export const { logout } = authSlice.actions
 export const authReducer = authSlice.reducer;

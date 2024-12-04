@@ -2,6 +2,7 @@ import {
   Alert,
   Box,
   Button,
+  CircularProgress,
   Typography,
 } from "@mui/material";
 import { Formik, Form, } from "formik";
@@ -13,7 +14,7 @@ import { useEffect} from "react";
 import { LoginData } from "../Interfaces/LoginData";
 import { login } from "../lib/Slices/AuthSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../lib/store";
+import { AppDispatch, GlobalState } from "../lib/store";
 
 const validationSchema = Yup.object({
   email: Yup.string().email("Invalid email").required("Email is required"),
@@ -24,7 +25,7 @@ const validationSchema = Yup.object({
 export default function Login() {
   const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate();
-  const {error , isError, isLoading , token} = useSelector((state:RootState)=>state.auth)
+  const {error , isError, isLoading , token} = useSelector((state:GlobalState)=>state.auth)
   const initialValues = {
     email: "",
     password: "",
@@ -67,11 +68,6 @@ export default function Login() {
               value={values.email}
             />
             <ErrorMessageComp name="email" />
-            {isError && (
-              <Alert severity="warning" className="mb-4">
-                {error}
-              </Alert>
-            )}
             {/* Password */}
             <Inputs
               label="Password"
@@ -81,9 +77,14 @@ export default function Login() {
               value={values.password}
             />
             <ErrorMessageComp name="password" />
+            {isError && (
+              <Alert severity="error" className="mb-4">
+                {error}
+              </Alert>
+            )}
             {/* Submit Button */}
             <Button disabled={isLoading} variant="contained" type="submit" className="w-full">
-              Login
+              {isLoading ? <CircularProgress size={'30px'} /> : 'Login'}
             </Button>
           </Box>
         </Form>

@@ -11,18 +11,31 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-// import AdbIcon from '@mui/icons-material/Adb';
 import PostAddIcon from "@mui/icons-material/PostAdd";
-import { NavLink } from "react-router-dom";
-
-const pages = [
-  { path: "/", text: "Home" },
-  { path: "/login", text: "Login" },
-  { path: "/registration", text: "Registration" },
-];
-const settings = ["Profile"];
+import { Link, NavLink } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { GlobalState } from "../lib/store";
+import { logout } from "../lib/Slices/AuthSlice";
 
 function Navbar() {
+  const dispatch = useDispatch();
+  const { token } = useSelector((state: GlobalState) => state.auth);
+  const pages = [
+    ...(!token
+      ? [
+          { path: "/login", text: "Login" },
+          { path: "/registration", text: "Registration" },
+        ]
+      : []),
+    ...(token ? [{ path: "/", text: "Home" }] : []),
+  ];
+  const settings = [
+    ...(token ? [
+      { path: "/login", text: "Logout" },
+      { path: "/profile", text: "Profile" },
+    ] : []),
+  ];
+
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
@@ -53,8 +66,8 @@ function Navbar() {
           <Typography
             variant="h6"
             noWrap
-            component="a"
-            href="#app-bar-with-responsive-menu"
+            component={Link}
+            to={'/'}
             sx={{
               mr: 2,
               display: { xs: "none", md: "flex" },
@@ -108,8 +121,8 @@ function Navbar() {
           <Typography
             variant="h5"
             noWrap
-            component="a"
-            href="#app-bar-with-responsive-menu"
+            component={Link}
+            to={'/'}
             sx={{
               mr: 2,
               display: { xs: "flex", md: "none" },
@@ -136,10 +149,6 @@ function Navbar() {
               </NavLink>
             ))}
           </Box>
-          <Box sx={{ mr: "10px" , display: { xs: "flex", md: "none" } }}>
-            <Button sx={{ color: "white" }}>Login</Button>
-            <Button sx={{ color: "white" }}>Register</Button>
-          </Box>
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
@@ -162,11 +171,21 @@ function Navbar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {setting}
-                  </Typography>
+              {settings.map(({ path, text }) => (
+                <MenuItem
+                  key={text}
+                  onClick={() => {
+                    if (text === "Logout") {
+                      dispatch(logout());
+                      handleCloseUserMenu();
+                    } else {
+                      handleCloseUserMenu();
+                    }
+                  }}
+                >
+                  <NavLink to={path}>
+                    <Typography sx={{ textAlign: "center" }}>{text}</Typography>
+                  </NavLink>
                 </MenuItem>
               ))}
             </Menu>
