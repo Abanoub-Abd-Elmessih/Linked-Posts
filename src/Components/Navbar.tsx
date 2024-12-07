@@ -60,7 +60,7 @@ function Navbar() {
   };
 
   return (
-    <AppBar position="static" className="py-2 md:p-0">
+    <AppBar position="sticky" className="py-2 md:p-0">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <PostAddIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />

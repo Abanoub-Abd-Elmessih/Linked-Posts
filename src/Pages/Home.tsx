@@ -14,8 +14,10 @@ export default function Home() {
   );
   
   useEffect(() => {
-    dispatch(getPosts(50));
-  }, []);
+    if (posts.length === 0) {
+      dispatch(getPosts(50));
+    }
+  }, [dispatch,posts]);
 
   if (isLoading) {
     return (
@@ -24,10 +26,11 @@ export default function Home() {
   }
 
   return (
-    <Container maxWidth="md">
+    <Container maxWidth="sm">
       {posts.map((post) => (
         <CardComponent key={post._id} post={post} />
       ))}
     </Container>
   );
 }
+

@@ -4,12 +4,12 @@ import { AppDispatch, GlobalState } from "../lib/store";
 import { useEffect } from "react";
 import { getSinglePost } from "../lib/Slices/PostsSlice";
 import Loading from "../Components/Loading";
+import PostDetailsCard from "../Components/PostDetailsCard";
 import { Container } from "@mui/material";
-import CardComponent from "../Components/CardComponent";
 
 export default function PostDetails() {
   const { id } = useParams<{ id: string }>();
-  const {singlePost } = useSelector((state:GlobalState)=>state.posts)
+  const {singlePost , isLoading} = useSelector((state:GlobalState)=>state.posts)
   console.log(singlePost);
   
   const dispatch = useDispatch<AppDispatch>()
@@ -19,14 +19,14 @@ export default function PostDetails() {
   }
   },[dispatch, id])
 
+  if (isLoading) {
+    return <Loading/>
+  }
   return (
-    <Container maxWidth="md">
-    {/* Only render CardComponent if singlePost is not null */}
-    {singlePost ? (
-      <CardComponent post={singlePost} showAllComments={true} />
-    ) : (
-      <Loading />
-    )}
-  </Container>
+    <Container maxWidth='xl'>
+      {singlePost && (
+            <PostDetailsCard post={singlePost} />
+      )}
+    </Container>
   )
 }

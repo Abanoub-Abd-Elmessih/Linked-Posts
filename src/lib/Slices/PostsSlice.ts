@@ -27,6 +27,7 @@ const postsSlice = createSlice({
     },
     reducers:{},
     extraReducers(builder){
+        // Handle Posts
         builder.addCase(getPosts.fulfilled, (state,action:any)=>{
             state.posts = action.payload.data.posts
             state.isLoading = false;
@@ -37,9 +38,10 @@ const postsSlice = createSlice({
         builder.addCase(getPosts.rejected, (state) => {
             state.isLoading = false;
         });
+        // Handle single Post
         builder.addCase(getSinglePost.fulfilled,(state,action:any)=>{
-            state.singlePost = action.payload.data.post
             state.isLoading=false
+            state.singlePost = action.payload.data.post
         })
         builder.addCase(getSinglePost.pending, (state)=>{
             state.isLoading=true
