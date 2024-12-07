@@ -13,11 +13,23 @@ import InsertCommentIcon from "@mui/icons-material/InsertComment";
 import { postInterface } from "../Interfaces/Posts";
 import { Box } from "@mui/material";
 import { red } from "@mui/material/colors";
+import { useNavigate } from "react-router-dom";
 
-export default function CardComponent({ post }: { post: postInterface }) {
+interface CardComponentProps {
+  post: postInterface;
+  showAllComments?: boolean;
+}
+
+export default function CardComponent({
+  post,
+  showAllComments,
+}: CardComponentProps) {
+  const navigate = useNavigate();
   return (
     <Card sx={{ marginY: "25px" }}>
       <CardHeader
+        onClick={() => navigate(`/PostDetails/${post._id}`)}
+        className="hover:bg-slate-100 duration-300 ease-in-out cursor-pointer"
         avatar={
           <Avatar
             src={post.user.photo}
@@ -60,20 +72,37 @@ export default function CardComponent({ post }: { post: postInterface }) {
           boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
         }}
       >
-        <IconButton aria-label="add to favorites">
-          <FavoriteIcon />
-        </IconButton>
-        <IconButton aria-label="Comment on post">
-          <InsertCommentIcon />
-        </IconButton>
-        <IconButton aria-label="share">
-          <ShareIcon />
-        </IconButton>
+        <div className="flex flex-1 items-center justify-center">
+          <IconButton aria-label="add to favorites">
+            <FavoriteIcon />
+            <p className="text-base ms-2">Like</p>
+          </IconButton>
+        </div>
+        <div className="border-x border-gray-400 flex flex-1 items-center justify-center">
+          <IconButton aria-label="Comment on post">
+            <InsertCommentIcon />
+            <p className="text-base ms-2">Comment</p>
+          </IconButton>
+        </div>
+        <div className="flex flex-1 items-center justify-center">
+          <IconButton aria-label="share">
+            <ShareIcon />
+            <p className="text-base ms-2">Share</p>
+          </IconButton>
+        </div>
       </CardActions>
-      {post.comments[0] && (
-        <Box sx={{ border: "0.5px solid #D7D3BF", borderRadius: "5px" ,bgcolor: '#F1F1F1', paddingBottom:2}}>
+      {!showAllComments && post.comments[0] && (
+        <Box
+          sx={{
+            border: "0.5px solid #D7D3BF",
+            borderRadius: "5px",
+            bgcolor: "#F1F1F1",
+            paddingBottom: 2,
+            marginTop: "10px",
+          }}
+        >
           <CardHeader
-           sx={{ paddingBottom: "5px" }}
+            sx={{ paddingBottom: "5px" }}
             avatar={
               <Avatar
                 src={post.comments[0].commentCreator.photo}
@@ -91,9 +120,55 @@ export default function CardComponent({ post }: { post: postInterface }) {
             subheader={post.comments[0].createdAt}
             titleTypographyProps={{ style: { cursor: "pointer" } }}
           />
-          <Typography sx={{paddingLeft:9 , fontWeight:600 , margin:0}} component={"p"}>{post.comments[0].content}</Typography>
+          <Typography
+            sx={{ paddingLeft: 9, fontWeight: 600, margin: 0 }}
+            component={"p"}
+          >
+            {post.comments[0].content}
+          </Typography>
         </Box>
       )}
+      {showAllComments &&
+        post.comments.map((comment) => {
+          return (
+            <Box
+              key={comment._id}
+              sx={{
+                border: "0.5px solid #D7D3BF",
+                borderRadius: "5px",
+                bgcolor: "#F1F1F1",
+                paddingBottom: 2,
+                marginY: "10px",
+              }}
+            >
+              <CardHeader
+                sx={{ paddingBottom: "5px" }}
+                avatar={
+                  <Avatar
+                    src={comment.commentCreator.photo}
+                    alt={comment.commentCreator.name}
+                    sx={{ cursor: "pointer", bgcolor: red[500] }}
+                    aria-label="recipe"
+                  />
+                }
+                action={
+                  <IconButton aria-label="settings">
+                    <MoreVertIcon />
+                  </IconButton>
+                }
+                title={comment.commentCreator.name}
+                subheader={comment.createdAt}
+                titleTypographyProps={{ style: { cursor: "pointer" } }}
+              />
+              <Typography
+                sx={{ paddingLeft: 9, fontWeight: 600, margin: 0 }}
+                component={"p"}
+              >
+                {comment.content}
+              </Typography>
+            </Box>
+          );
+        })}
     </Card>
   );
 }

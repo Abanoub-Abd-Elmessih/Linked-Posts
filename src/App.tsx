@@ -7,6 +7,7 @@ import { Provider } from "react-redux";
 import { store } from "./lib/store";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import Profile from "./Pages/Profile";
+import SinglePost from "./Pages/PostDetails";
 function App() {
   const router = createBrowserRouter([
     {
@@ -23,6 +24,12 @@ function App() {
           path:'/profile',
           element: <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>,
+        },
+        {
+          path:'/PostDetails/:id',
+          element: <ProtectedRoute>
+            <SinglePost />
           </ProtectedRoute>,
         },
         {
