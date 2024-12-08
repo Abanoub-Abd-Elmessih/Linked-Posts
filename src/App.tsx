@@ -8,6 +8,7 @@ import { store } from "./lib/store";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import Profile from "./Pages/Profile";
 import SinglePost from "./Pages/PostDetails";
+import { Toaster } from "react-hot-toast";
 function App() {
   const router = createBrowserRouter([
     {
@@ -47,6 +48,7 @@ function App() {
   return (
     <Provider store={store}>
       <RouterProvider router={router} />
+      <Toaster />
     </Provider>
   );
 }

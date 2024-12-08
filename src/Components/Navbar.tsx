@@ -27,12 +27,14 @@ function Navbar() {
           { path: "/registration", text: "Registration" },
         ]
       : []),
-    ...(token ? [{ path: "/", text: "Home" }] : []),
+    ...(token ? [
+      { path: "/", text: "Home" },
+      { path: "/profile", text: "Profile" },
+    ] : []),
   ];
   const settings = [
     ...(token
       ? [
-          { path: "/profile", text: "Profile" },
           { path: "/login", text: "Logout" },
         ]
       : []),

@@ -2,13 +2,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { LoginData } from "../../Interfaces/LoginData";
-import { User } from "../../Interfaces/Posts";
+import { UserDataInterface } from "../../Interfaces/UserData";
 
 export const login = createAsyncThunk('Auth/login', async (values: LoginData)=>{
     const response = await axios.post('https://linked-posts.routemisr.com/users/signin', values);
-    
     return response;
-})
+});
 
 export const getUserData = createAsyncThunk('Auth/getUserData', async ()=>{
   try {
@@ -20,9 +19,12 @@ export const getUserData = createAsyncThunk('Auth/getUserData', async ()=>{
     return response.data;
   } catch (error) {
     console.log(error);
-    
+    throw error;
   }
-})
+});
+
+// New async thunk for uploading user photo
+
 
 interface AuthState {
   token: string;
@@ -30,7 +32,7 @@ interface AuthState {
   isError: boolean;
   error: string;
   isSuccess: boolean;
-  userData: User | null;
+  userData: UserDataInterface | null;
 }
 
 // Initial state
@@ -45,15 +47,6 @@ const initialState: AuthState = {
 
 export const authSlice = createSlice({
   name: "Auth",
-  // initialState: {
-  //   token: localStorage.getItem('token') || '',
-  //   isLoading: false,
-  //   isError: false,
-  //   error: '',
-  //   isSuccess: false,
-  //   userData: localStorage.getItem('userData') 
-  //   ? JSON.parse(localStorage.getItem('userData') as string) : ''
-  // },
   initialState,
   reducers: {
     logout(state) {
@@ -96,7 +89,7 @@ export const authSlice = createSlice({
     .addCase(getUserData.rejected, (state, action: any) => {
       state.userData = null;
       state.error = action.payload?.message ?? 'Failed to fetch user data';
-    });
+    })
   }
 });
 
