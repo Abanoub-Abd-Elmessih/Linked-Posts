@@ -19,7 +19,7 @@ import { logout } from "../lib/Slices/AuthSlice";
 
 function Navbar() {
   const dispatch = useDispatch();
-  const { token } = useSelector((state: GlobalState) => state.auth);
+  const { token, userData } = useSelector((state: GlobalState) => state.auth);
   const pages = [
     ...(!token
       ? [
@@ -32,8 +32,8 @@ function Navbar() {
   const settings = [
     ...(token
       ? [
-        { path: "/profile", text: "Profile" },
-        { path: "/login", text: "Logout" },
+          { path: "/profile", text: "Profile" },
+          { path: "/login", text: "Logout" },
         ]
       : []),
   ];
@@ -130,7 +130,7 @@ function Navbar() {
               flexGrow: 1,
               fontFamily: "monospace",
               fontWeight: 700,
-              letterSpacing: ".3rem",
+              letterSpacing: ".2rem",
               color: "inherit",
               textDecoration: "none",
             }}
@@ -139,7 +139,7 @@ function Navbar() {
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages.map(({ text, path }) => (
-              <NavLink to={path}>
+              <NavLink key={text} to={path}>
                 <Button
                   key={text}
                   onClick={handleCloseNavMenu}
@@ -151,10 +151,12 @@ function Navbar() {
             ))}
           </Box>
           <Box sx={{ flexGrow: 0 }}>
-            {token && (
+            {token && userData && (
               <Tooltip title="Open settings">
-                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                <IconButton
+                  onClick={handleOpenUserMenu}
+                >
+                  <Avatar alt={userData?.name} src={userData?.photo} />
                 </IconButton>
               </Tooltip>
             )}

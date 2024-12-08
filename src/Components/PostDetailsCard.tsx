@@ -33,8 +33,8 @@ export default function PostDetailsCard({ post }: { post: postInterface }) {
           alt="Post image"
           sx={{
             width: { xs: "100%", lg: "70%" },
-            height: { xs: "500px", sm: "800px" },
-            objectFit: {xs: "cover" , sm: 'cover'},
+            height: { xs: "auto", sm: "800px" },
+            objectFit: {xs: "contain" , sm: 'cover'},
             borderRadius: '5px'
           }}
         />

@@ -35,6 +35,7 @@ const ScrollToTopButton = () => {
     <>
       {backToTopBtn && (
         <Fab
+          size="medium"
           color="primary"
           aria-label="scroll to top"
           onClick={scrollToTop}

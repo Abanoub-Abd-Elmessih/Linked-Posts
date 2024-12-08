@@ -6,18 +6,25 @@ import { AppDispatch, GlobalState } from "../lib/store";
 import CardComponent from "../Components/CardComponent";
 import { postInterface } from "../Interfaces/Posts";
 import Loading from "../Components/Loading";
+import { getUserData } from "../lib/Slices/AuthSlice";
 
 export default function Home() {
   const dispatch = useDispatch<AppDispatch>();
   const { posts, isLoading }: { posts: postInterface[]; isLoading:boolean } = useSelector(
     (state: GlobalState) => state.posts
   );
+  const { token, userData } = useSelector(
+    (state: GlobalState) => state.auth
+  );
   
   useEffect(() => {
     if (posts.length === 0) {
       dispatch(getPosts(50));
     }
-  }, [dispatch,posts]);
+    if (token && !userData) {
+      dispatch(getUserData());
+    }
+  }, [dispatch,posts,token,userData]);
 
   if (isLoading) {
     return (

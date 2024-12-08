@@ -27,13 +27,14 @@ export default function Login() {
   const { error, isError, isLoading, token } = useSelector(
     (state: GlobalState) => state.auth
   );
+  
   const initialValues = {
     email: "",
     password: "",
   };
 
   useEffect(() => {
-    if (token != "") {
+    if (token) {
       navigate("/");
     }
   }, [token, navigate]);
