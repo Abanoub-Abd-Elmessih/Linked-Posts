@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from 'react';
-import { Formik, Form } from 'formik';
+import React, { useState } from "react";
+import { Formik, Form } from "formik";
 import {
   Container,
   Typography,
@@ -9,25 +9,26 @@ import {
   Avatar,
   Box,
   Button,
-  CircularProgress
+  CircularProgress,
 } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
 import { GlobalState } from "../lib/store";
-import { uploadUserPhoto } from '../lib/Slices/ProfileSlice';
-import toast from 'react-hot-toast';
+import { uploadUserPhoto } from "../lib/Slices/ProfileSlice";
+import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
 
 export default function Profile() {
   const dispatch = useDispatch();
   const { userData } = useSelector((state: GlobalState) => state.auth);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);  // Add preview state
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null); // Add preview state
   const [isLoading, setIsLoading] = useState<boolean>(false); // Loading state
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
       setSelectedFile(file);
-      
+
       // Generate a preview URL for the selected image
       const preview = URL.createObjectURL(file);
       setPreviewUrl(preview);
@@ -36,32 +37,32 @@ export default function Profile() {
 
   const handlePhotoUpload = async () => {
     if (!selectedFile) {
-      toast.error('Please select a file first');
+      toast.error("Please select a file first");
       return;
     }
 
     const formData = new FormData();
-    formData.append('photo', selectedFile);
+    formData.append("photo", selectedFile);
 
-    setIsLoading(true);  // Set loading to true when upload starts
+    setIsLoading(true); // Set loading to true when upload starts
 
     try {
       // Dispatch the upload action from the auth slice
       await dispatch(uploadUserPhoto(formData) as any).unwrap();
-      toast.success('Profile photo updated successfully!');
+      toast.success("Profile photo updated successfully!");
       setSelectedFile(null);
-      setPreviewUrl(null);  // Clear the preview after upload
+      setPreviewUrl(null); // Clear the preview after upload
     } catch (error) {
-      console.error('Error uploading file', error);
-      toast.error('Failed to upload photo');
+      console.error("Error uploading file", error);
+      toast.error("Failed Image is Too Large");
     } finally {
-      setIsLoading(false);  // Set loading to false when upload finishes
+      setIsLoading(false); // Set loading to false when upload finishes
     }
   };
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Card sx={{ py: 5, px: { xs: '0px', sm: '30px' } }}>
+      <Card sx={{ py: 5, px: { xs: "0px", sm: "30px" } }}>
         <Box
           display="flex"
           flexDirection={{ xs: "column", md: "row" }}
@@ -71,7 +72,7 @@ export default function Profile() {
           {/* Profile Picture and Name */}
           <Box textAlign="center" flexBasis="33%">
             <Avatar
-              src={previewUrl || userData?.photo} 
+              src={previewUrl || userData?.photo}
               alt={userData?.name}
               sx={{
                 width: 150,
@@ -93,28 +94,21 @@ export default function Profile() {
                 type="file"
                 accept="image/jpg,image/jpeg,image/png"
                 onChange={handleFileChange}
-                style={{ display: 'none' }}
+                style={{ display: "none" }}
               />
               <label htmlFor="profile-photo-upload">
-                <Button 
-                  variant="contained" 
-                  component="span" 
-                >
+                <Button variant="contained" component="span">
                   Choose Profile Photo
                 </Button>
               </label>
-              <Button 
-                variant="contained" 
-                color="primary" 
+              <Button
+                variant="contained"
+                color="primary"
                 onClick={handlePhotoUpload}
-                disabled={!selectedFile || isLoading}  // Disable button when loading
-                className='w-3/4'
+                disabled={!selectedFile || isLoading} // Disable button when loading
+                className="w-3/4"
               >
-                {isLoading ? (
-                  <CircularProgress size="25px" />
-                ) : (
-                  'Upload Photo'
-                )}
+                {isLoading ? <CircularProgress size="25px" /> : "Upload Photo"}
               </Button>
             </Box>
           </Box>
@@ -122,17 +116,18 @@ export default function Profile() {
           {/* User Details */}
           <Box
             flexBasis="67%"
+            width={'90%'}
             sx={{ border: "1px solid #ECEBDE", borderRadius: "10px" }}
           >
             <Formik
               initialValues={{
-                name: userData?.name || '',
-                email: userData?.email || '',
-                dateOfBirth: userData?.dateOfBirth || '',
-                gender: userData?.gender || '',
-                createdAt: userData?.createdAt 
-                  ? new Date(userData.createdAt).toLocaleDateString() 
-                  : 'N/A'
+                name: userData?.name || "",
+                email: userData?.email || "",
+                dateOfBirth: userData?.dateOfBirth || "",
+                gender: userData?.gender || "",
+                createdAt: userData?.createdAt
+                  ? new Date(userData.createdAt).toLocaleDateString()
+                  : "N/A",
               }}
               onSubmit={(values) => {
                 // Implement update profile logic if needed
@@ -142,7 +137,11 @@ export default function Profile() {
               {({ values }) => (
                 <Form>
                   <CardContent>
-                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                    <Typography
+                      variant="h6"
+                      gutterBottom
+                      sx={{ fontWeight: 600 }}
+                    >
                       Profile Information
                     </Typography>
                     <Typography variant="body1" sx={{ mt: 1 }}>
@@ -164,6 +163,9 @@ export default function Profile() {
                 </Form>
               )}
             </Formik>
+            <Button variant="contained" color="primary" sx={{ml:2, mb:2}}>
+              <Link to={"/changePassword"}>Change Password</Link>
+            </Button>
           </Box>
         </Box>
       </Card>

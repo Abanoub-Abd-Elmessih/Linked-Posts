@@ -9,6 +9,7 @@ import ProtectedRoute from "./Components/ProtectedRoute";
 import Profile from "./Pages/Profile";
 import SinglePost from "./Pages/PostDetails";
 import { Toaster } from "react-hot-toast";
+import ChangePassword from "./Pages/ChangePassword";
 function App() {
   const router = createBrowserRouter([
     {
@@ -31,6 +32,12 @@ function App() {
           path:'/PostDetails/:id',
           element: <ProtectedRoute>
             <SinglePost />
+          </ProtectedRoute>,
+        },
+        {
+          path:'/changePassword',
+          element: <ProtectedRoute>
+            <ChangePassword />
           </ProtectedRoute>,
         },
         {

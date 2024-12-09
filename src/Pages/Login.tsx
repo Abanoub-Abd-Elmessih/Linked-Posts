@@ -24,7 +24,7 @@ const validationSchema = Yup.object({
 export default function Login() {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { error, isError, isLoading, token } = useSelector(
+  const { isError, isLoading, token } = useSelector(
     (state: GlobalState) => state.auth
   );
   
@@ -88,7 +88,7 @@ export default function Login() {
             <ErrorMessageComp name="password" />
             {isError && (
               <Alert severity="error" className="mb-4">
-                {error}
+                Wrong Email Or Password
               </Alert>
             )}
             {/* Submit Button */}
