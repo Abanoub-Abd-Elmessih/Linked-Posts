@@ -266,11 +266,11 @@ export default function PostDetailsCard({ post }: { post: postInterface }) {
                 />
               }
               action={
-                userId?._id === comment.commentCreator._id && (
+                userId?._id === post.user._id && (
                   <>
                     <IconButton
-                      aria-label="delete"
-                      onClick={() => deleteComment(comment._id)}
+                    aria-label="delete"
+                    onClick={() => deleteComment(comment._id)}
                     >
                       <DeleteIcon />
                     </IconButton>
