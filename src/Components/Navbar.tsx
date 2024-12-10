@@ -12,7 +12,7 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import PostAddIcon from "@mui/icons-material/PostAdd";
-import { Link, NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { GlobalState } from "../lib/store";
 import { logout } from "../lib/Slices/AuthSlice";
@@ -113,9 +113,9 @@ function Navbar() {
             >
               {pages.map(({ path, text }) => (
                 <MenuItem key={text} onClick={handleCloseNavMenu}>
-                  <NavLink to={path}>
+                  <Link to={path}>
                     <Typography sx={{ textAlign: "center" }}>{text}</Typography>
-                  </NavLink>
+                  </Link>
                 </MenuItem>
               ))}
             </Menu>
@@ -141,7 +141,7 @@ function Navbar() {
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages.map(({ text, path }) => (
-              <NavLink key={text} to={path}>
+              <Link key={text} to={path}>
                 <Button
                   key={text}
                   onClick={handleCloseNavMenu}
@@ -149,7 +149,7 @@ function Navbar() {
                 >
                   {text}
                 </Button>
-              </NavLink>
+              </Link>
             ))}
           </Box>
           <Box sx={{ flexGrow: 0 }}>
@@ -190,9 +190,9 @@ function Navbar() {
                     }
                   }}
                 >
-                  <NavLink to={path}>
+                  <Link to={path}>
                     <Typography sx={{ textAlign: "center" }}>{text}</Typography>
-                  </NavLink>
+                  </Link>
                 </MenuItem>
               ))}
             </Menu>

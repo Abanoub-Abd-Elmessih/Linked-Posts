@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
 import CardMedia from "@mui/material/CardMedia";
@@ -16,6 +17,11 @@ import { useNavigate } from "react-router-dom";
 import { UserDataInterface } from "../Interfaces/UserData";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import { useDispatch } from "react-redux";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { getPosts } from "../lib/Slices/PostsSlice";
+import { AppDispatch } from "../lib/store";
 
 interface CardComponentProps {
   post: postInterface;
@@ -27,6 +33,26 @@ const userId: UserDataInterface | null = userDataString
 
 export default function CardComponent({ post }: CardComponentProps) {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  async function deleteComment(commentId: string) {
+    try {
+      const { data } = await axios.delete(
+        `https://linked-posts.routemisr.com/comments/${commentId}`,
+        {
+          headers: {
+            token: localStorage.getItem("token"),
+          },
+        }
+      );
+      if (data.message == "success") {
+        toast.success("Comment deleted successfully");
+        dispatch(getPosts(50));
+      }
+    } catch (error: any) {
+      toast.error("failed to delete comment", error);
+    }
+  }
+
   return (
     <Card sx={{ marginY: "25px" }}>
       <CardHeader
@@ -122,7 +148,7 @@ export default function CardComponent({ post }: CardComponentProps) {
             action={
               userId?._id === post.comments[0].commentCreator._id && (
                 <>
-                  <IconButton aria-label="delete">
+                  <IconButton aria-label="delete" onClick={() => deleteComment(post.comments[0]._id)}>
                     <DeleteIcon />
                   </IconButton>
                   <IconButton aria-label="edit">
