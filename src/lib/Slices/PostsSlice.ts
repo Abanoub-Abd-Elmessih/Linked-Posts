@@ -4,7 +4,7 @@
 
 
     export const getPosts = createAsyncThunk('posts/getPosts',async(limit:number = 50)=>{
-        return await axios.get(`https://linked-posts.routemisr.com/posts?limit=${limit}`,{
+        return await axios.get(`https://linked-posts.routemisr.com/posts?page=40&limit=${limit}`,{
             headers:{
                 token:localStorage.getItem("token") || '',
             }

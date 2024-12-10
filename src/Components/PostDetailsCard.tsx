@@ -8,11 +8,16 @@ import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShareIcon from "@mui/icons-material/Share";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import InsertCommentIcon from "@mui/icons-material/InsertComment";
 import { Box } from "@mui/material";
 import { red } from "@mui/material/colors";
 import { postInterface } from "../Interfaces/Posts";
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import { UserDataInterface } from "../Interfaces/UserData";
+
+const userDataString = localStorage.getItem('userData');
+const userId: UserDataInterface | null = userDataString ? JSON.parse(userDataString) : null;
 
 export default function PostDetailsCard({ post }: { post: postInterface }) {
   if (!post) return <Typography>No Post Found</Typography>;
@@ -51,9 +56,16 @@ export default function PostDetailsCard({ post }: { post: postInterface }) {
             />
           }
           action={
-            <IconButton aria-label="settings">
-              <MoreVertIcon />
-            </IconButton>
+            userId?._id === post.user._id && (
+              <>
+                <IconButton aria-label="delete">
+                  <DeleteIcon />
+                </IconButton>
+                <IconButton aria-label="edit">
+                  <EditIcon />
+                </IconButton>
+              </>
+            )
           }
           title={post.user.name}
           subheader={new Date(post.createdAt).toLocaleString()}
@@ -122,6 +134,18 @@ export default function PostDetailsCard({ post }: { post: postInterface }) {
                   alt={comment.commentCreator.name}
                   sx={{ cursor: "pointer", bgcolor: red[500] }}
                 />
+              }
+              action={
+                userId?._id === comment.commentCreator._id && (
+                  <>
+                    <IconButton aria-label="delete">
+                      <DeleteIcon />
+                    </IconButton>
+                    <IconButton aria-label="edit">
+                      <EditIcon />
+                    </IconButton>
+                  </>
+                )
               }
               title={comment.commentCreator.name}
               subheader={new Date(comment.createdAt).toLocaleString()}

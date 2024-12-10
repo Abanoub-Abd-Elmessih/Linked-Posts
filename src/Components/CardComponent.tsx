@@ -8,22 +8,24 @@ import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShareIcon from "@mui/icons-material/Share";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import InsertCommentIcon from "@mui/icons-material/InsertComment";
 import { postInterface } from "../Interfaces/Posts";
 import { Box } from "@mui/material";
 import { red } from "@mui/material/colors";
 import { useNavigate } from "react-router-dom";
+import { UserDataInterface } from "../Interfaces/UserData";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 
 interface CardComponentProps {
   post: postInterface;
-  showAllComments?: boolean;
 }
+const userDataString = localStorage.getItem("userData");
+const userId: UserDataInterface | null = userDataString
+  ? JSON.parse(userDataString)
+  : null;
 
-export default function CardComponent({
-  post,
-  showAllComments,
-}: CardComponentProps) {
+export default function CardComponent({ post }: CardComponentProps) {
   const navigate = useNavigate();
   return (
     <Card sx={{ marginY: "25px" }}>
@@ -38,13 +40,19 @@ export default function CardComponent({
             aria-label="recipe"
           />
         }
-        action={
-          <IconButton aria-label="settings">
-            <MoreVertIcon />
-          </IconButton>
-        }
         title={post.user.name}
-        subheader={post.createdAt}
+        subheader={
+          <>
+            {new Date(post.createdAt).toLocaleDateString()}
+            {userId?._id === post.user._id && (
+              <Typography
+                sx={{ display: "inline", marginLeft: 1, color: "primary.main" , bgcolor:'#D7D3BF' , padding:'5px' , borderRadius:'5px' }}
+              >
+                Your Post
+              </Typography>
+            )}
+          </>
+        }
         titleTypographyProps={{ style: { cursor: "pointer" } }}
       />
 
@@ -91,7 +99,7 @@ export default function CardComponent({
           </IconButton>
         </div>
       </CardActions>
-      {!showAllComments && post.comments[0] && (
+      {post.comments[0] && (
         <Box
           sx={{
             border: "0.5px solid #D7D3BF",
@@ -112,9 +120,16 @@ export default function CardComponent({
               />
             }
             action={
-              <IconButton aria-label="settings">
-                <MoreVertIcon />
-              </IconButton>
+              userId?._id === post.comments[0].commentCreator._id && (
+                <>
+                  <IconButton aria-label="delete">
+                    <DeleteIcon />
+                  </IconButton>
+                  <IconButton aria-label="edit">
+                    <EditIcon />
+                  </IconButton>
+                </>
+              )
             }
             title={post.comments[0].commentCreator.name}
             subheader={post.comments[0].createdAt}
@@ -128,47 +143,6 @@ export default function CardComponent({
           </Typography>
         </Box>
       )}
-      {showAllComments &&
-        post.comments.map((comment) => {
-          return (
-            <Box
-              key={comment._id}
-              sx={{
-                border: "0.5px solid #D7D3BF",
-                borderRadius: "5px",
-                bgcolor: "#F1F1F1",
-                paddingBottom: 2,
-                marginY: "10px",
-              }}
-            >
-              <CardHeader
-                sx={{ paddingBottom: "5px" }}
-                avatar={
-                  <Avatar
-                    src={comment.commentCreator.photo}
-                    alt={comment.commentCreator.name}
-                    sx={{ cursor: "pointer", bgcolor: red[500] }}
-                    aria-label="recipe"
-                  />
-                }
-                action={
-                  <IconButton aria-label="settings">
-                    <MoreVertIcon />
-                  </IconButton>
-                }
-                title={comment.commentCreator.name}
-                subheader={comment.createdAt}
-                titleTypographyProps={{ style: { cursor: "pointer" } }}
-              />
-              <Typography
-                sx={{ paddingLeft: 9, fontWeight: 600, margin: 0 }}
-                component={"p"}
-              >
-                {comment.content}
-              </Typography>
-            </Box>
-          );
-        })}
     </Card>
   );
 }
