@@ -36,6 +36,8 @@ export default function PostDetailsCard({ post }: { post: postInterface }) {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const [makeComment, setMakeComment] = useState(false);
+  const [makeEditComment, setMakeEditComment] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
 
   if (!post) return <Typography>No Post Found</Typography>;
 
@@ -97,6 +99,28 @@ export default function PostDetailsCard({ post }: { post: postInterface }) {
       }
     } catch (error: any) {
       toast.error("Failed to post comment", error);
+    }
+  }
+
+  async function editComment(values: { content: string }, commentId: string) {
+    try {
+      const { data } = await axios.put(
+        `https://linked-posts.routemisr.com/comments/${commentId}`,
+        values,
+        {
+          headers: {
+            token: localStorage.getItem("token") || "",
+          },
+        }
+      );
+      if (data.message === "success") {
+        toast.success("Comment Edited Successfully");
+        dispatch(getSinglePost(post._id));
+        setMakeEditComment(false);
+        setEditingCommentId(null);
+      }
+    } catch (error: any) {
+      toast.error("Failed to edit comment", error);
     }
   }
 
@@ -203,7 +227,7 @@ export default function PostDetailsCard({ post }: { post: postInterface }) {
           </IconButton>
         </CardActions>
 
-        {/* Comments */}
+        {/* Create Comment */}
         {makeComment && (
           <Box sx={{border:'1px solid #D7D3BF', m:2,p:2 , borderRadius:2}}>
           <Formik
@@ -226,11 +250,11 @@ export default function PostDetailsCard({ post }: { post: postInterface }) {
                   type="text"
                   value={values.content}
                   onChange={handleChange}
+                  autoFocus={true}
                 />
                 {errors.content && (
                   <Typography color="error">{errors.content}</Typography>
                 )}
-                {/* <button type="submit">Submit</button> */}
                 <Button
                   variant="contained"
                   color="primary"
@@ -245,6 +269,7 @@ export default function PostDetailsCard({ post }: { post: postInterface }) {
         </Box>
         )}
 
+        {/* Comments */}
         {post.comments?.map((comment) => (
           <Box
             key={comment._id}
@@ -266,16 +291,27 @@ export default function PostDetailsCard({ post }: { post: postInterface }) {
                 />
               }
               action={
-                userId?._id === post.user._id && (
-                  <>
+                <>
+                  {userId?._id === post.user._id && (
                     <IconButton
-                    aria-label="delete"
-                    onClick={() => deleteComment(comment._id)}
+                      aria-label="delete"
+                      onClick={() => deleteComment(comment._id)}
                     >
                       <DeleteIcon />
                     </IconButton>
-                  </>
-                )
+                  )}
+                  {userId?._id === comment.commentCreator._id && (
+                    <IconButton 
+                      aria-label="edit"
+                      onClick={() => {
+                        setMakeEditComment(true);
+                        setEditingCommentId(comment._id);
+                      }}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                  )}
+                </>
               }
               title={comment.commentCreator.name}
               subheader={new Date(comment.createdAt).toLocaleString()}
@@ -284,6 +320,59 @@ export default function PostDetailsCard({ post }: { post: postInterface }) {
             <Typography sx={{ pl: 9, fontWeight: 600 }}>
               {comment.content}
             </Typography>
+
+            {/* Edit Comment Form */}
+            {makeEditComment && editingCommentId === comment._id && (
+              <Box sx={{border:'1px solid #D7D3BF', m:2,p:2 , borderRadius:2}}>
+                <Formik
+                  initialValues={{ content: comment.content }}
+                  validationSchema={Yup.object({
+                    content: Yup.string()
+                      .required("Content is required")
+                      .min(2, "Comment must be at least 2 characters long"),
+                  })}
+                  onSubmit={(values, { resetForm }) => {
+                    editComment(values, comment._id);
+                    resetForm();
+                  }}
+                >
+                  {({ handleChange, values, errors }) => (
+                    <Form>
+                      <Inputs
+                        label="Edit your comment"
+                        name="content"
+                        type="text"
+                        value={values.content}
+                        onChange={handleChange}
+                        autoFocus={true}
+                      />
+                      {errors.content && (
+                        <Typography color="error">{errors.content}</Typography>
+                      )}
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        type="submit"
+                        sx={{ mt: 2 }}
+                      >
+                        Update Comment
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="secondary"
+                        sx={{ mt: 2, ml: 2 }}
+                        onClick={() => {
+                          setMakeEditComment(false);
+                          setEditingCommentId(null);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </Form>
+                  )}
+                </Formik>
+              </Box>
+            )}
           </Box>
         ))}
       </Box>

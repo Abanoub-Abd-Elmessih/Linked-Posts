@@ -6,9 +6,10 @@ interface InputsProps {
   name: string;
   value: string;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  autoFocus?:boolean
 }
 
-export default function Inputs({ label, type, name, value, onChange,}: InputsProps) {
+export default function Inputs({ label, type, name, value, onChange,autoFocus}: InputsProps) {
   return (
     <div>
       <TextField
@@ -20,6 +21,7 @@ export default function Inputs({ label, type, name, value, onChange,}: InputsPro
         value={value}
         onChange={onChange}
         fullWidth
+        autoFocus={autoFocus}
       />
     </div>
   );

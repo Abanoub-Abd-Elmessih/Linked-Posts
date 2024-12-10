@@ -11,7 +11,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShareIcon from "@mui/icons-material/Share";
 import InsertCommentIcon from "@mui/icons-material/InsertComment";
 import { postInterface } from "../Interfaces/Posts";
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { red } from "@mui/material/colors";
 import { useNavigate } from "react-router-dom";
 import { UserDataInterface } from "../Interfaces/UserData";
@@ -22,6 +22,10 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { getPosts } from "../lib/Slices/PostsSlice";
 import { AppDispatch } from "../lib/store";
+import { useState } from "react";
+import { Formik, Form } from "formik";
+import * as Yup from "yup";
+import Inputs from "./Inputs";
 
 interface CardComponentProps {
   post: postInterface;
@@ -34,6 +38,10 @@ const userId: UserDataInterface | null = userDataString
 export default function CardComponent({ post }: CardComponentProps) {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
+  const [makeComment, setMakeComment] = useState(false);
+  const [makeEditComment, setMakeEditComment] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+
   async function deleteComment(commentId: string) {
     try {
       const { data } = await axios.delete(
@@ -50,6 +58,47 @@ export default function CardComponent({ post }: CardComponentProps) {
       }
     } catch (error: any) {
       toast.error("failed to delete comment", error);
+    }
+  }
+  async function createComment(values: { content: string; post: string }) {
+    try {
+      const { data } = await axios.post(
+        `https://linked-posts.routemisr.com/comments`,
+        values,
+        {
+          headers: {
+            token: localStorage.getItem("token") || "",
+          },
+        }
+      );
+      if (data.message === "success") {
+        toast.success("Comment Posted Successfully");
+        dispatch(getPosts(50));
+        setMakeComment(false);
+      }
+    } catch (error: any) {
+      toast.error("Failed to post comment", error);
+    }
+  }
+  async function editComment(values: { content: string }, commentId: string) {
+    try {
+      const { data } = await axios.put(
+        `https://linked-posts.routemisr.com/comments/${commentId}`,
+        values,
+        {
+          headers: {
+            token: localStorage.getItem("token") || "",
+          },
+        }
+      );
+      if (data.message === "success") {
+        toast.success("Comment Edited Successfully");
+        dispatch(getPosts(50));
+        setMakeEditComment(false);
+        setEditingCommentId(null);
+      }
+    } catch (error: any) {
+      toast.error("Failed to edit comment", error);
     }
   }
 
@@ -72,7 +121,14 @@ export default function CardComponent({ post }: CardComponentProps) {
             {new Date(post.createdAt).toLocaleDateString()}
             {userId?._id === post.user._id && (
               <Typography
-                sx={{ display: "inline", marginLeft: 1, color: "primary.main" , bgcolor:'#D7D3BF' , padding:'5px' , borderRadius:'5px' }}
+                sx={{
+                  display: "inline",
+                  marginLeft: 1,
+                  color: "primary.main",
+                  bgcolor: "#D7D3BF",
+                  padding: "5px",
+                  borderRadius: "5px",
+                }}
               >
                 Your Post
               </Typography>
@@ -113,7 +169,10 @@ export default function CardComponent({ post }: CardComponentProps) {
           </IconButton>
         </div>
         <div className="border-x border-gray-400 flex flex-1 items-center justify-center">
-          <IconButton aria-label="Comment on post">
+          <IconButton
+            aria-label="Comment on post"
+            onClick={() => setMakeComment(!makeComment)}
+          >
             <InsertCommentIcon />
             <p className="text-base ms-2">Comment</p>
           </IconButton>
@@ -125,6 +184,49 @@ export default function CardComponent({ post }: CardComponentProps) {
           </IconButton>
         </div>
       </CardActions>
+
+      {/* Comments */}
+      {makeComment && (
+        <Box sx={{ border: "1px solid #D7D3BF", m: 2, p: 2, borderRadius: 2 }}>
+          <Formik
+            initialValues={{ content: "", post: post._id }}
+            validationSchema={Yup.object({
+              content: Yup.string()
+                .required("Content is required")
+                .min(2, "Comment must be at least 2 characters long"),
+            })}
+            onSubmit={(values, { resetForm }) => {
+              createComment(values);
+              resetForm();
+            }}
+          >
+            {({ handleChange, values, errors }) => (
+              <Form>
+                <Inputs
+                  label="Enter your comment"
+                  name="content"
+                  type="text"
+                  value={values.content}
+                  onChange={handleChange}
+                  autoFocus={true}
+                />
+                {errors.content && (
+                  <Typography color="error">{errors.content}</Typography>
+                )}
+                <Button
+                  variant="contained"
+                  color="primary"
+                  type="submit"
+                  sx={{ mt: 2 }}
+                >
+                  Post Comment
+                </Button>
+              </Form>
+            )}
+          </Formik>
+        </Box>
+      )}
+
       {post.comments[0] && (
         <Box
           sx={{
@@ -146,16 +248,27 @@ export default function CardComponent({ post }: CardComponentProps) {
               />
             }
             action={
-              userId?._id === post.comments[0].commentCreator._id && (
-                <>
-                  <IconButton aria-label="delete" onClick={() => deleteComment(post.comments[0]._id)}>
+              <>
+                {userId?._id === post.user._id && (
+                  <IconButton
+                    aria-label="delete"
+                    onClick={() => deleteComment(post.comments[0]._id)}
+                  >
                     <DeleteIcon />
                   </IconButton>
-                  <IconButton aria-label="edit">
+                )}
+                {userId?._id === post.comments[0].commentCreator._id && (
+                  <IconButton
+                    aria-label="edit"
+                    onClick={() => {
+                      setMakeEditComment(true);
+                      setEditingCommentId(post.comments[0]._id);
+                    }}
+                  >
                     <EditIcon />
                   </IconButton>
-                </>
-              )
+                )}
+              </>
             }
             title={post.comments[0].commentCreator.name}
             subheader={post.comments[0].createdAt}
@@ -167,6 +280,62 @@ export default function CardComponent({ post }: CardComponentProps) {
           >
             {post.comments[0].content}
           </Typography>
+
+
+          {/* Edit Comment Form */}
+          {makeEditComment && editingCommentId === post.comments[0]._id && (
+            <Box
+              sx={{ border: "1px solid #D7D3BF", m: 2, p: 2, borderRadius: 2 }}
+            >
+              <Formik
+                initialValues={{ content: post.comments[0].content }}
+                validationSchema={Yup.object({
+                  content: Yup.string()
+                    .required("Content is required")
+                    .min(2, "Comment must be at least 2 characters long"),
+                })}
+                onSubmit={(values, { resetForm }) => {
+                  editComment(values, post.comments[0]._id);
+                  resetForm();
+                }}
+              >
+                {({ handleChange, values, errors }) => (
+                  <Form>
+                    <Inputs
+                      label="Edit your comment"
+                      name="content"
+                      type="text"
+                      value={values.content}
+                      onChange={handleChange}
+                      autoFocus={true}
+                    />
+                    {errors.content && (
+                      <Typography color="error">{errors.content}</Typography>
+                    )}
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      type="submit"
+                      sx={{ mt: 2 }}
+                    >
+                      Update Comment
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      sx={{ mt: 2, ml: 2 }}
+                      onClick={() => {
+                        setMakeEditComment(false);
+                        setEditingCommentId(null);
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  </Form>
+                )}
+              </Formik>
+            </Box>
+          )}
         </Box>
       )}
     </Card>
