@@ -11,18 +11,11 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShareIcon from "@mui/icons-material/Share";
 import InsertCommentIcon from "@mui/icons-material/InsertComment";
 import { postInterface } from "../Interfaces/Posts";
-import { Box, Button } from "@mui/material";
-import { red } from "@mui/material/colors";
-import { useNavigate } from "react-router-dom";
-import { UserDataInterface } from "../Interfaces/UserData";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import { useDispatch } from "react-redux";
+import { Box, Button, CircularProgress } from "@mui/material";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { getPosts } from "../lib/Slices/PostsSlice";
-import { AppDispatch } from "../lib/store";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import Inputs from "./Inputs";
@@ -30,37 +23,35 @@ import Inputs from "./Inputs";
 interface CardComponentProps {
   post: postInterface;
 }
-const userDataString = localStorage.getItem("userData");
-const userId: UserDataInterface | null = userDataString
-  ? JSON.parse(userDataString)
-  : null;
+const userId = JSON.parse(localStorage.getItem("userData") || '{}');
 
 export default function CardComponent({ post }: CardComponentProps) {
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
   const [makeComment, setMakeComment] = useState(false);
-  const [makeEditComment, setMakeEditComment] = useState(false);
-  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [totalComments, setTotalComments] = useState<number>(0);
+  const [loading, setLoading] = useState(false);
 
-  async function deleteComment(commentId: string) {
+  useEffect(() => {
+    getAllComments(post._id);
+  }, [post._id]);
+
+  async function getAllComments(postId: string) {
     try {
-      const { data } = await axios.delete(
-        `https://linked-posts.routemisr.com/comments/${commentId}`,
+      const { data } = await axios.get(
+        `https://linked-posts.routemisr.com/posts/${postId}/comments`,
         {
           headers: {
-            token: localStorage.getItem("token"),
+            token: localStorage.getItem("token") || "",
           },
         }
       );
-      if (data.message == "success") {
-        toast.success("Comment deleted successfully");
-        dispatch(getPosts(50));
-      }
-    } catch (error: any) {
-      toast.error("failed to delete comment", error);
+      setTotalComments(data.total);
+    } catch (error) {
+      console.error(error);
     }
   }
   async function createComment(values: { content: string; post: string }) {
+    setLoading(true)
     try {
       const { data } = await axios.post(
         `https://linked-posts.routemisr.com/comments`,
@@ -73,32 +64,13 @@ export default function CardComponent({ post }: CardComponentProps) {
       );
       if (data.message === "success") {
         toast.success("Comment Posted Successfully");
-        dispatch(getPosts(50));
         setMakeComment(false);
+        getAllComments(post._id)
       }
     } catch (error: any) {
       toast.error("Failed to post comment", error);
-    }
-  }
-  async function editComment(values: { content: string }, commentId: string) {
-    try {
-      const { data } = await axios.put(
-        `https://linked-posts.routemisr.com/comments/${commentId}`,
-        values,
-        {
-          headers: {
-            token: localStorage.getItem("token") || "",
-          },
-        }
-      );
-      if (data.message === "success") {
-        toast.success("Comment Edited Successfully");
-        dispatch(getPosts(50));
-        setMakeEditComment(false);
-        setEditingCommentId(null);
-      }
-    } catch (error: any) {
-      toast.error("Failed to edit comment", error);
+    }finally{
+      setLoading(false)
     }
   }
 
@@ -151,9 +123,22 @@ export default function CardComponent({ post }: CardComponentProps) {
           component="img"
           height="194"
           image={post.image}
-          alt="Paella dish"
+          alt={post.user.name}
         />
       )}
+      <Typography
+        sx={{
+          color: "text.secondary",
+          wordBreak: "break-word",
+          textAlign: "end",
+          padding: "5px",
+          fontSize: "14px",
+        }}
+      >
+        <Link to={`/PostDetails/${post._id}`}>
+          {totalComments == 0 ? "" : `${totalComments} comments`}
+        </Link>
+      </Typography>
       <CardActions
         disableSpacing
         sx={{
@@ -195,9 +180,8 @@ export default function CardComponent({ post }: CardComponentProps) {
                 .required("Content is required")
                 .min(2, "Comment must be at least 2 characters long"),
             })}
-            onSubmit={(values, { resetForm }) => {
+            onSubmit={(values) => {
               createComment(values);
-              resetForm();
             }}
           >
             {({ handleChange, values, errors }) => (
@@ -211,131 +195,20 @@ export default function CardComponent({ post }: CardComponentProps) {
                   autoFocus={true}
                 />
                 {errors.content && (
-                  <Typography color="error">{errors.content}</Typography>
+                  <Typography color="error" sx={{padding:'5px'}}>{errors.content}</Typography>
                 )}
                 <Button
                   variant="contained"
-                  color="primary"
                   type="submit"
                   sx={{ mt: 2 }}
+                  className="w-full"
+                  disabled={loading}
                 >
-                  Post Comment
+                  {loading? <CircularProgress size={"30px"} /> : 'Post Comment'}
                 </Button>
               </Form>
             )}
           </Formik>
-        </Box>
-      )}
-
-      {post.comments[0] && (
-        <Box
-          sx={{
-            border: "0.5px solid #D7D3BF",
-            borderRadius: "5px",
-            bgcolor: "#F1F1F1",
-            paddingBottom: 2,
-            marginTop: "10px",
-          }}
-        >
-          <CardHeader
-            sx={{ paddingBottom: "5px" }}
-            avatar={
-              <Avatar
-                src={post.comments[0].commentCreator.photo}
-                alt={post.comments[0].commentCreator.name}
-                sx={{ cursor: "pointer", bgcolor: red[500] }}
-                aria-label="recipe"
-              />
-            }
-            action={
-              <>
-                {userId?._id === post.user._id && (
-                  <IconButton
-                    aria-label="delete"
-                    onClick={() => deleteComment(post.comments[0]._id)}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                )}
-                {userId?._id === post.comments[0].commentCreator._id && (
-                  <IconButton
-                    aria-label="edit"
-                    onClick={() => {
-                      setMakeEditComment(true);
-                      setEditingCommentId(post.comments[0]._id);
-                    }}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                )}
-              </>
-            }
-            title={post.comments[0].commentCreator.name}
-            subheader={post.comments[0].createdAt}
-            titleTypographyProps={{ style: { cursor: "pointer" } }}
-          />
-          <Typography
-            sx={{ paddingLeft: 9, fontWeight: 600, margin: 0 }}
-            component={"p"}
-          >
-            {post.comments[0].content}
-          </Typography>
-
-
-          {/* Edit Comment Form */}
-          {makeEditComment && editingCommentId === post.comments[0]._id && (
-            <Box
-              sx={{ border: "1px solid #D7D3BF", m: 2, p: 2, borderRadius: 2 }}
-            >
-              <Formik
-                initialValues={{ content: post.comments[0].content }}
-                validationSchema={Yup.object({
-                  content: Yup.string()
-                    .required("Content is required")
-                    .min(2, "Comment must be at least 2 characters long"),
-                })}
-                onSubmit={(values, { resetForm }) => {
-                  editComment(values, post.comments[0]._id);
-                  resetForm();
-                }}
-              >
-                {({ handleChange, values, errors }) => (
-                  <Form>
-                    <Inputs
-                      label="Edit your comment"
-                      name="content"
-                      type="text"
-                      value={values.content}
-                      onChange={handleChange}
-                      autoFocus={true}
-                    />
-                    {errors.content && (
-                      <Typography color="error">{errors.content}</Typography>
-                    )}
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      type="submit"
-                      sx={{ mt: 2 }}
-                    >
-                      Update Comment
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      color="secondary"
-                      sx={{ mt: 2, ml: 2 }}
-                      onClick={() => {
-                        setMakeEditComment(false);
-                        setEditingCommentId(null);
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                  </Form>
-                )}
-              </Formik>
-            </Box>
-          )}
         </Box>
       )}
     </Card>
