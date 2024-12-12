@@ -7,6 +7,7 @@ import CardComponent from "../Components/CardComponent";
 import { postInterface } from "../Interfaces/Posts";
 import Loading from "../Components/Loading";
 import { getUserData } from "../lib/Slices/AuthSlice";
+import AddPostComp from "../Components/AddPostComp";
 
 export default function Home() {
   const dispatch = useDispatch<AppDispatch>();
@@ -33,7 +34,8 @@ export default function Home() {
   }
 
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="sm" sx={{paddingY:5}}>
+      <AddPostComp/>
       {posts.map((post) => (
         <CardComponent key={post._id} post={post} />
       ))}

@@ -181,7 +181,7 @@ export default function PostDetailsCard({ post }: { post: postInterface }) {
           sx={{
             width: { xs: "100%", lg: "70%" },
             height: { xs: "auto", sm: "800px" },
-            objectFit: { xs: "contain", sm: "cover" },
+            objectFit: { xs: "contain", sm: "contain" },
             borderRadius: "5px",
           }}
         />
@@ -360,7 +360,7 @@ export default function PostDetailsCard({ post }: { post: postInterface }) {
                 bgcolor: "#F1F1F1",
                 marginY: "10px",
                 marginX: "7px",
-                opacity: commentsLoading ? 0.5 : 1,
+                opacity: commentsLoading ? 0 : 1,
               }}
             >
               <CardHeader
@@ -368,7 +368,7 @@ export default function PostDetailsCard({ post }: { post: postInterface }) {
                   <Avatar
                     src={comment.commentCreator.photo}
                     alt={comment.commentCreator.name}
-                    sx={{ cursor: "pointer", bgcolor: red[500] }}
+                    sx={{ cursor: "pointer", bgcolor: red[500]}}
                   />
                 }
                 action={
@@ -445,10 +445,10 @@ export default function PostDetailsCard({ post }: { post: postInterface }) {
                   </Formik>
                 </Box>
               ) : (
-                <CardContent>
+                <CardContent sx={{padding:0}}>
                   <Typography
                     variant="body2"
-                    sx={{ color: "text.secondary", wordBreak: "break-word" , fontWeight:700 , ml:3}}
+                    sx={{ color: "text.secondary", wordBreak: "break-word" , fontWeight:700 , ml:9, px:'2px'}}
                   >
                     {comment.content}
                   </Typography>

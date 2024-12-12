@@ -7,9 +7,14 @@ interface InputsProps {
   value: string;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   autoFocus?:boolean
+  variant?: 'filled' | 'outlined' | 'standard';
+  multiline?:boolean
+  rows?:number
+  required?:boolean
+  accept?:string
 }
 
-export default function Inputs({ label, type, name, value, onChange,autoFocus}: InputsProps) {
+export default function Inputs({ label, type, name, value, onChange,autoFocus , variant = 'filled',multiline=false,rows, required, accept}: InputsProps) {
   return (
     <div>
       <TextField
@@ -17,11 +22,15 @@ export default function Inputs({ label, type, name, value, onChange,autoFocus}: 
         id={name}
         name={name}
         label={label}
-        variant="filled"
+        variant={variant}
         value={value}
         onChange={onChange}
         fullWidth
         autoFocus={autoFocus}
+        multiline={multiline}
+        rows={rows}
+        required={required}
+        inputProps={type === "file" ? { accept } : undefined}
       />
     </div>
   );

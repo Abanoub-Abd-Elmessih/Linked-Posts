@@ -21,8 +21,8 @@ export default function Profile() {
   const dispatch = useDispatch();
   const { userData } = useSelector((state: GlobalState) => state.auth);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null); // Add preview state
-  const [isLoading, setIsLoading] = useState<boolean>(false); // Loading state
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -105,7 +105,7 @@ export default function Profile() {
                 variant="contained"
                 color="primary"
                 onClick={handlePhotoUpload}
-                disabled={!selectedFile || isLoading} // Disable button when loading
+                disabled={!selectedFile || isLoading} 
                 className="w-3/4"
               >
                 {isLoading ? <CircularProgress size="25px" /> : "Upload Photo"}
@@ -130,7 +130,6 @@ export default function Profile() {
                   : "N/A",
               }}
               onSubmit={(values) => {
-                // Implement update profile logic if needed
                 console.log(values);
               }}
             >
