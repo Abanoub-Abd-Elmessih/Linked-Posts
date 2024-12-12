@@ -7,7 +7,7 @@ export default function ErrorMessageComp({name}:{name:string}) {
         name={name}
         component="div"
         className="text-red-500 text-sm"
-      />pro
+      />
     </div>
   );
 }

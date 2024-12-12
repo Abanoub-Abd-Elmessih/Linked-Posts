@@ -58,7 +58,7 @@ export default function PostDetailsCard({ post }: { post: postInterface }) {
         `https://linked-posts.routemisr.com/posts/${postId}`,
         {
           headers: {
-            token: localStorage.getItem("token") || "",
+            token: localStorage.getItem("token"),
           },
         }
       );
@@ -79,7 +79,7 @@ export default function PostDetailsCard({ post }: { post: postInterface }) {
         `https://linked-posts.routemisr.com/posts/${postId}/comments`,
         {
           headers: {
-            token: localStorage.getItem("token") || "",
+            token: localStorage.getItem("token"),
           },
         }
       );
@@ -100,7 +100,7 @@ export default function PostDetailsCard({ post }: { post: postInterface }) {
         `https://linked-posts.routemisr.com/comments/${commentId}`,
         {
           headers: {
-            token: localStorage.getItem("token") || "",
+            token: localStorage.getItem("token"),
           },
         }
       );
@@ -123,7 +123,7 @@ export default function PostDetailsCard({ post }: { post: postInterface }) {
         values,
         {
           headers: {
-            token: localStorage.getItem("token") || "",
+            token: localStorage.getItem("token"),
           },
         }
       );
@@ -147,7 +147,7 @@ export default function PostDetailsCard({ post }: { post: postInterface }) {
         values,
         {
           headers: {
-            token: localStorage.getItem("token") || "",
+            token: localStorage.getItem("token"),
           },
         }
       );
