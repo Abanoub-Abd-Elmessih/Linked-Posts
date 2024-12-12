@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Formik, Form } from "formik";
 import {
   Container,
@@ -16,20 +16,30 @@ import { GlobalState } from "../lib/store";
 import { uploadUserPhoto } from "../lib/Slices/ProfileSlice";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import CardComponent from "../Components/CardComponent";
+import { postInterface } from "../Interfaces/Posts";
 
 export default function Profile() {
   const dispatch = useDispatch();
   const { userData } = useSelector((state: GlobalState) => state.auth);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isPhotoLoading, setIsPhotoLoading] = useState<boolean>(false);
+  const [posts, setPosts] = useState<postInterface[]>([]);
+  const [isPostsLoading, setIsPostsLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (userData?._id) {
+      getUserPosts(userData?._id);
+    }
+  }, [userData?._id]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
       setSelectedFile(file);
 
-      // Generate a preview URL for the selected image
       const preview = URL.createObjectURL(file);
       setPreviewUrl(preview);
     }
@@ -44,19 +54,38 @@ export default function Profile() {
     const formData = new FormData();
     formData.append("photo", selectedFile);
 
-    setIsLoading(true); // Set loading to true when upload starts
+    setIsPhotoLoading(true);
 
     try {
-      // Dispatch the upload action from the auth slice
       await dispatch(uploadUserPhoto(formData) as any).unwrap();
       toast.success("Profile photo updated successfully!");
       setSelectedFile(null);
-      setPreviewUrl(null); // Clear the preview after upload
+      setPreviewUrl(null);
     } catch (error) {
       console.error("Error uploading file", error);
       toast.error("Failed Image is Too Large");
     } finally {
-      setIsLoading(false); // Set loading to false when upload finishes
+      setIsPhotoLoading(false);
+    }
+  };
+
+  const getUserPosts = async (userId: string) => {
+    setIsPostsLoading(true);
+    try {
+      const { data } = await axios.get(
+        `https://linked-posts.routemisr.com/users/${userId}/posts`,
+        {
+          headers: {
+            token: localStorage.getItem("token"),
+          },
+        }
+      );
+      setPosts(data.posts);
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+      toast.error("Failed to load posts");
+    } finally {
+      setIsPostsLoading(false);
     }
   };
 
@@ -105,10 +134,10 @@ export default function Profile() {
                 variant="contained"
                 color="primary"
                 onClick={handlePhotoUpload}
-                disabled={!selectedFile || isLoading} 
+                disabled={!selectedFile || isPhotoLoading}
                 className="w-3/4"
               >
-                {isLoading ? <CircularProgress size="25px" /> : "Upload Photo"}
+                {isPhotoLoading ? <CircularProgress size="25px" /> : "Upload Photo"}
               </Button>
             </Box>
           </Box>
@@ -116,7 +145,7 @@ export default function Profile() {
           {/* User Details */}
           <Box
             flexBasis="67%"
-            width={'90%'}
+            width={"90%"}
             sx={{ border: "1px solid #ECEBDE", borderRadius: "10px" }}
           >
             <Formik
@@ -162,12 +191,60 @@ export default function Profile() {
                 </Form>
               )}
             </Formik>
-            <Button variant="contained" color="primary" sx={{ml:2, mb:2}}>
+            <Button variant="contained" color="primary" sx={{ ml: 2, mb: 2 }}>
               <Link to={"/changePassword"}>Change Password</Link>
             </Button>
           </Box>
         </Box>
       </Card>
+      <Container
+        maxWidth="md"
+        sx={{
+          border: "1.5px solid #D7D3BF",
+          my: 3,
+          borderRadius: "10px",
+        }}
+      >
+        <Typography
+          component="h1"
+          variant="h4"
+          className="text-center"
+          sx={{ mt: 3 }}
+        >
+          Your Posts
+        </Typography>
+        <Box
+          sx={{
+            width: { xs: "50%", sm: "20%" },
+            height: "4px",
+            background: "linear-gradient(90deg, #1e3a8a, #3b82f6)",
+            marginY: "4px",
+            marginX: "auto",
+          }}
+        />
+        {isPostsLoading ? (
+          <Box 
+            display="flex" 
+            justifyContent="center" 
+            alignItems="center" 
+            height="200px"
+          >
+            <CircularProgress />
+          </Box>
+        ) : posts.length > 0 ? (
+          posts.map((post) => (
+            <CardComponent key={post._id} post={post} />
+          ))
+        ) : (
+          <Typography 
+            variant="body1" 
+            align="center" 
+            sx={{ my: 3, color: "text.secondary" }}
+          >
+            You don't have posts yet. Start Sharing now
+          </Typography>
+        )}
+      </Container>
     </Container>
   );
 }

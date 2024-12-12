@@ -19,14 +19,18 @@ import { useEffect, useState } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import Inputs from "./Inputs";
+import { useSelector } from "react-redux";
+import { GlobalState } from "../lib/store";
 
 interface CardComponentProps {
   post: postInterface;
 }
-const userId = JSON.parse(localStorage.getItem("userData") || '{}');
+// const userId = JSON.parse(localStorage.getItem("userData") || '{}');
 
 export default function CardComponent({ post }: CardComponentProps) {
   const navigate = useNavigate();
+  const { userData } = useSelector((state: GlobalState) => state.auth);
+  
   const [makeComment, setMakeComment] = useState(false);
   const [totalComments, setTotalComments] = useState<number>(0);
   const [loading, setLoading] = useState(false);
@@ -91,7 +95,7 @@ export default function CardComponent({ post }: CardComponentProps) {
         subheader={
           <>
             {new Date(post.createdAt).toLocaleDateString()}
-            {userId?._id === post.user._id && (
+            {userData?._id === post.user._id && (
               <Typography
                 sx={{
                   display: "inline",
