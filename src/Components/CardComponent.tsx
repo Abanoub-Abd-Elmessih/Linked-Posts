@@ -8,7 +8,6 @@ import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import ShareIcon from "@mui/icons-material/Share";
 import InsertCommentIcon from "@mui/icons-material/InsertComment";
 import { postInterface } from "../Interfaces/Posts";
 import { Box, Button, CircularProgress } from "@mui/material";
@@ -25,7 +24,6 @@ import { GlobalState } from "../lib/store";
 interface CardComponentProps {
   post: postInterface;
 }
-// const userId = JSON.parse(localStorage.getItem("userData") || '{}');
 
 export default function CardComponent({ post }: CardComponentProps) {
   const navigate = useNavigate();
@@ -164,12 +162,6 @@ export default function CardComponent({ post }: CardComponentProps) {
           >
             <InsertCommentIcon />
             <p className="text-base ms-2">Comment</p>
-          </IconButton>
-        </div>
-        <div className="flex flex-1 items-center justify-center">
-          <IconButton aria-label="share">
-            <ShareIcon />
-            <p className="text-base ms-2">Share</p>
           </IconButton>
         </div>
       </CardActions>

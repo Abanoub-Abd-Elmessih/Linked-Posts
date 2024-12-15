@@ -80,7 +80,12 @@ export default function Profile() {
           },
         }
       );
-      setPosts(data.posts);
+      const sortedPosts = data.posts.sort(
+        (a: postInterface, b: postInterface) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+  
+      setPosts(sortedPosts);
     } catch (error) {
       console.error("Error fetching posts:", error);
       toast.error("Failed to load posts");

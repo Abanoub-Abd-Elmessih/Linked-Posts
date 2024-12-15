@@ -8,7 +8,6 @@ import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import ShareIcon from "@mui/icons-material/Share";
 import InsertCommentIcon from "@mui/icons-material/InsertComment";
 import { Box, Button, CircularProgress } from "@mui/material";
 import { red } from "@mui/material/colors";
@@ -162,7 +161,7 @@ export default function PostDetailsCard({ post }: { post: postInterface }) {
     } finally {
       setCommentsLoading(false);
     }
-  }
+  } 
 
   return (
     <Card
@@ -210,9 +209,6 @@ export default function PostDetailsCard({ post }: { post: postInterface }) {
                   onClick={() => deletePost(post._id)}
                 >
                   <DeleteIcon />
-                </IconButton>
-                <IconButton aria-label="edit">
-                  <EditIcon />
                 </IconButton>
               </>
             )
@@ -267,13 +263,6 @@ export default function PostDetailsCard({ post }: { post: postInterface }) {
             <InsertCommentIcon />
             <Typography variant="body2" sx={{ ml: 1 }}>
               Comment
-            </Typography>
-          </IconButton>
-
-          <IconButton aria-label="share">
-            <ShareIcon />
-            <Typography variant="body2" sx={{ ml: 1 }}>
-              Share
             </Typography>
           </IconButton>
         </CardActions>
