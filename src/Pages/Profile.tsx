@@ -28,6 +28,7 @@ export default function Profile() {
   const [isPhotoLoading, setIsPhotoLoading] = useState<boolean>(false);
   const [posts, setPosts] = useState<postInterface[]>([]);
   const [isPostsLoading, setIsPostsLoading] = useState<boolean>(false);
+  const [totalPosts, setTotalPosts] = useState<number>(0)
 
   useEffect(() => {
     if (userData?._id) {
@@ -68,7 +69,6 @@ export default function Profile() {
       setIsPhotoLoading(false);
     }
   };
-
   const getUserPosts = async (userId: string) => {
     setIsPostsLoading(true);
     try {
@@ -84,7 +84,7 @@ export default function Profile() {
         (a: postInterface, b: postInterface) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
-  
+      setTotalPosts(data.paginationInfo.total)
       setPosts(sortedPosts);
     } catch (error) {
       console.error("Error fetching posts:", error);
@@ -218,6 +218,7 @@ export default function Profile() {
         >
           Your Posts
         </Typography>
+        <p className="text-center">total Posts : {totalPosts}</p>
         <Box
           sx={{
             width: { xs: "50%", sm: "20%" },
